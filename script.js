@@ -12,8 +12,8 @@ let touching = {
   right: false
 };
 
-let x = 100;
-let y = 100;
+let x = Math.random() * (window.innerWidth - dvd.offsetWidth);
+let y = Math.random() * (window.innerHeight - dvd.offsetHeight);
 
 // velocidad adaptativa
 let speed = window.innerWidth <= 768 ? 0.9 : 1.4;
