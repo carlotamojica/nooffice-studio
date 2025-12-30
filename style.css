@@ -1,183 +1,368 @@
-:root {
-  --text-size: 24px;
-  --line-height: 0.95;
-}
-
-@media (max-width: 768px) {
-  :root {
-    --text-size: 22px; /* tamaño de texto más pequeño en móvil */
-    --line-height: 0.95; /* interlineado un poco más grande en móvil */
-  }
-}
-
-.intro-text {
-  position: fixed;
-  inset: 0;
-  margin: auto;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  max-width: 620px;
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .intro-text {
-    padding: 16px;
-    max-width: 100%; /* opcional pero recomendable en móvil */
-  }
-}
-
-.intro-text {
-  font-size: var(--text-size);
-  line-height: var(--line-height);
-}
-
-.footer-links {
-  font-size: var(--text-size);
-  line-height: var(--line-height);
-}
-
-.footer-links a,
-.footer-links p {
-  font-size: inherit;
-  line-height: inherit;
-}
-
-* {
+/* BASE */
+body {
   margin: 0;
-  padding: 0;
+  font-family: "Times", "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  background: #fff;
+  color: #000;
+  cursor: crosshair;
+}
+
+/* LINKS */
+a {
+  color: #000;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #000;
+}
+
+/* HEADER */
+.site-header {
+  position: static;
+  top: 0;
+  left: 0;
+  padding: 0.4rem;
+}
+
+/* TEXT */
+.site-content {
+  padding: 0.4rem 0.4rem 0 0.4rem;
+  max-width: 45rem;
+}
+
+.text p {
+  margin: 0 0 0.8rem 0;
+}
+
+/* GALLERY FIXED */
+.gallery {
+  width: 100%;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  margin-top: 3rem;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-
-  background: #ff4400;
+.custom-gallery {
+  display: grid;
+  grid-template-columns: repeat(21, 1fr);
+  gap: 0.4rem;
 }
 
-/* ---------- DVD ---------- */
-
-#dvd {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 600px;          /* DESKTOP */
-  aspect-ratio: 4 / 1;
-
-  will-change: transform;
-  transform: translateZ(0);
+@media (max-width: 768px) {
+  .custom-gallery {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
 
-.logo {
+/* ITEMS */
+.gallery-item {
   width: 100%;
-  height: auto;
-  display: none;
-
-  user-select: none;
-  pointer-events: none;
-}
-
-.logo-a {
   display: block;
+  filter: grayscale(100%);
+  mix-blend-mode: darken;
+  cursor: pointer;
+  user-select: none;
 }
 
-/* ---------- TEXTO CENTRAL ---------- */
+/* HOVER */
+@media (hover: hover) and (pointer: fine) {
+  .gallery-item:hover {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+}
 
-.intro-text {
+/* LIGHTBOX */
+.custom-lightbox {
+  --lb-margin: 0.4rem;
+}
+
+.custom-lightbox {
   position: fixed;
   inset: 0;
-  margin: auto;
+  background: #000;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 24px;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  padding: 2rem;
+  box-sizing: border-box;
 
-  max-width: 620px;
-  text-align: center;
-
-  color: #000;
-
-  pointer-events: none;
-  user-select: none;
-
-  transform-origin: center center;
+  z-index: 999;
 }
 
-/* ---------- FOOTER ---------- */
-
-.footer-links {
+/* HEADER LIGHTBOX */
+.lb-header {
   position: fixed;
-  bottom: 12px;
-  left: 0;
-  right: 0;
+  top: 0.4rem;
+  left: 0.4rem;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: "Times", "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 24px;
-  line-height: 0.95;        /* MISMO interlineado que el texto central */
-  letter-spacing: -0.02em;
+  color: #fff;
+  z-index: 1000;
 
-  color: #000;
-
-  pointer-events: auto;
+  user-select: none;
 }
 
-.footer-links a {
-  color: inherit;
-  text-decoration: none;
-  margin: 0;
-  padding: 0;
+.custom-lightbox[hidden] {
+  display: none;
 }
 
-/* ======================================================
-   MOBILE
-====================================================== */
+.custom-lightbox img,
+.custom-lightbox video {
+  max-width: calc(100vw - (var(--lb-margin) * 2));
+  max-height: calc(100vh - (var(--lb-margin) * 2));
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* CONTROLS */
+.lb-prev,
+.lb-next,
+.lb-close {
+  position: fixed;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lb-prev {
+  left: 10vw;
+  top: 52%;
+}
+
+.lb-next {
+  right: 10vw;
+  top: 52%;
+}
+
+.lb-close {
+  top: 0.4rem;
+  right: 0.4rem;
+}
+
+/* =========================================
+   DESKTOP (GALLERY FIXED)
+========================================= */
+
+@media (min-width: 769px) {
+
+  .gallery {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 1.6rem;
+
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+
+    z-index: 10;
+    background: #ffffff;
+  }
 
 @media (max-width: 768px) {
 
-  /* logo más pequeño */
-  #dvd {
-    width: 260px;
+  .custom-lightbox img,
+  .custom-lightbox video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
   }
 
-.footer-links {
-  transform: none !important;
-}
+  /* 🔴 CLAVE: solo para vídeo */
+  .custom-lightbox video {
+    object-fit: cover;
+    max-height: 70vh;
+  }
 }
 
-* {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none;
-  -ms-user-select: none;
+  body {
+    padding-bottom: 10rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery {
+    position: static;
+    margin-top: 2rem;
+  }
+}
+
+/* =========================
+   FONT RENDERING
+========================= */
+
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================
+   PLACEHOLDER FOR GALLERY ITEMS
+========================= */
+
+.gallery-item {
+  background: #e5e5e5;
+}
+
+/* images */
+.gallery-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* videos */
+.gallery-item video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* without flashes */
+.gallery-item {
+  overflow: hidden;
+}
+
+/* FOOTER */
+.site-footer {
+  padding: 0.4rem;
+  font-size: 13px;
+}
+
+/* GALLERY HEIGHT */
+@media (min-width: 769px) {
+  .gallery-spacer {
+    height: 9rem;
+  }
+}
+
+@media (min-width: 769px) {
+
+  .site-footer {
+    position: fixed;
+    left: 0.4rem;
+    bottom: 0.4rem;
+    padding: 0;
+    z-index: 11;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    position: static !important;
+    margin-top: 1.2rem;
+    padding: 0.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* LIGHTBOX */
+  .custom-lightbox {
+    padding: 1rem;
+  }
+
+  /* Center image */
+  .custom-lightbox img {
+    max-width: 97vw;
+    max-height: 70vh;
+  }
+
+  /* Navigation */
+  .lb-prev,
+  .lb-next {
+    top: auto;
+    bottom: 3rem;
+    transform: none;
+  }
+
+  .lb-prev {
+    left: 0.4rem;
+  }
+
+  .lb-next {
+    right: 0.4rem;
+  }
+}
+
+.custom-lightbox {
+  touch-action: pan-x pan-y;
+}
+
+.custom-lightbox *,
+.lb-prev,
+.lb-next,
+.lb-close {
   user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
-#dvd {
-  touch-action: none;
+/* =========================
+   FIX SAFARI 
+========================= */
+
+@supports (-webkit-touch-callout: none) {
+  .gallery-item {
+    mix-blend-mode: normal !important;
+  }
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
+@media (max-width: 768px) {
 
-.intro-text,
-.footer-links,
-.footer-links * {
-  font-size: var(--text-size) !important;
-  line-height: var(--line-height) !important;
+  .custom-lightbox {
+    padding: var(--lb-margin);
+  }
+
+  .custom-lightbox img,
+  .custom-lightbox video {
+    width: calc(100vw - (var(--lb-margin) * 2));
+    max-width: calc(100vw - (var(--lb-margin) * 2));
+    height: auto;
+    max-height: 70vh;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* Botones alineados al MISMO margen */
+  .lb-prev,
+  .lb-next {
+    top: auto;
+    bottom: 3rem;
+    transform: none;
+  }
+
+  .lb-prev {
+    left: var(--lb-margin);
+  }
+
+  .lb-next {
+    right: var(--lb-margin);
+  }
+
+  .lb-close {
+    right: var(--lb-margin);
+    top: var(--lb-margin);
+  }
 }
