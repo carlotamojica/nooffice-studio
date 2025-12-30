@@ -43,7 +43,7 @@ let points = [];
    RENDIMIENTO (Safari)
 -------------------------------- */
 let lastFrame = 0;
-const FRAME_INTERVAL = 1000 / 50;
+const FRAME_INTERVAL = 1000 / 120;
 
 /* -------------------------------
    HELPERS
