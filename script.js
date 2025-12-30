@@ -4,26 +4,50 @@ const logoB = document.querySelector(".logo-b");
 
 let showA = true;
 
-// locks por borde
-let touching = {
-  top: false,
-  bottom: false,
-  left: false,
-  right: false
-};
+/* -------------------------------
+   POSICIÓN Y VELOCIDAD
+-------------------------------- */
+let x = 0;
+let y = 0;
 
-let x = Math.random() * (window.innerWidth - dvd.offsetWidth);
-let y = Math.random() * (window.innerHeight - dvd.offsetHeight);
+let vx = 3;
+let vy = 3;
 
-// velocidad adaptativa
-let speed = window.innerWidth <= 768 ? 0.9 : 1.4;
-let vx = speed;
-let vy = speed;
+/* velocidad base (magnitud) */
+const BASE_SPEED = Math.hypot(vx, vy);
 
-// tamaños (se inicializan correctamente)
+/* -------------------------------
+   TAMAÑO
+-------------------------------- */
 let dvdWidth = 0;
 let dvdHeight = 0;
 
+/* -------------------------------
+   PARÁMETROS FÍSICOS
+-------------------------------- */
+const MAX_SPEED = 30;
+const THROW_MULT = 50;
+
+/* retorno al estado base */
+const RETURN_EASE = 0.01;
+const RETURN_DELAY = 500;
+let lastThrowTime = 0;
+
+/* -------------------------------
+   DRAG
+-------------------------------- */
+let isDragging = false;
+let points = [];
+
+/* -------------------------------
+   RENDIMIENTO (Safari)
+-------------------------------- */
+let lastFrame = 0;
+const FRAME_INTERVAL = 1000 / 50;
+
+/* -------------------------------
+   HELPERS
+-------------------------------- */
 function updateSizes() {
   dvdWidth = dvd.offsetWidth;
   dvdHeight = dvd.offsetHeight;
@@ -35,87 +59,136 @@ function toggleLogo() {
   logoB.style.display = showA ? "none" : "block";
 }
 
-function animate() {
-  // seguridad: si aún no hay tamaño, no animamos
+function clampSpeed() {
+  const speed = Math.hypot(vx, vy);
+  if (speed > MAX_SPEED) {
+    const k = MAX_SPEED / speed;
+    vx *= k;
+    vy *= k;
+  }
+}
+
+/* -------------------------------
+   DRAG EVENTS
+-------------------------------- */
+dvd.addEventListener("pointerdown", (e) => {
+  isDragging = true;
+  dvd.setPointerCapture(e.pointerId);
+  points = [{ x: e.clientX, y: e.clientY, t: performance.now() }];
+});
+
+window.addEventListener("pointermove", (e) => {
+  if (!isDragging) return;
+
+  const last = points[points.length - 1];
+  const dx = e.clientX - last.x;
+  const dy = e.clientY - last.y;
+
+  x += dx;
+  y += dy;
+
+  points.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+
+  while (
+    points.length > 2 &&
+    points[points.length - 1].t - points[0].t > 120
+  ) {
+    points.shift();
+  }
+
+  dvd.style.transform = `translate(${x}px, ${y}px)`;
+});
+
+window.addEventListener("pointerup", () => {
+  if (!isDragging) return;
+  isDragging = false;
+
+  if (points.length >= 2) {
+    const a = points[0];
+    const b = points[points.length - 1];
+
+    vx = (b.x - a.x) * THROW_MULT;
+    vy = (b.y - a.y) * THROW_MULT;
+
+    clampSpeed();
+    lastThrowTime = performance.now();
+  }
+
+  points = [];
+});
+
+window.addEventListener("pointercancel", () => {
+  isDragging = false;
+  points = [];
+});
+
+/* -------------------------------
+   ANIMACIÓN
+-------------------------------- */
+function animate(time) {
+  if (time - lastFrame < FRAME_INTERVAL) {
+    requestAnimationFrame(animate);
+    return;
+  }
+  lastFrame = time;
+
   if (!dvdWidth || !dvdHeight) {
     updateSizes();
     requestAnimationFrame(animate);
     return;
   }
 
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
+  if (!isDragging) {
+    x += vx;
+    y += vy;
 
-  x += vx;
-  y += vy;
+    // retorno suave manteniendo dirección
+    if (time - lastThrowTime > RETURN_DELAY) {
+      const speed = Math.hypot(vx, vy);
 
-  /* ---------- LEFT ---------- */
-  if (x <= 0) {
-    x = 0;
-    if (!touching.left) {
-      vx *= -1;
-      toggleLogo();
-      touching.left = true;
+      if (speed > 0) {
+        const newSpeed =
+          speed + (BASE_SPEED - speed) * RETURN_EASE;
+
+        const nx = vx / speed;
+        const ny = vy / speed;
+
+        vx = nx * newSpeed;
+        vy = ny * newSpeed;
+      }
     }
-  } else {
-    touching.left = false;
   }
 
-  /* ---------- RIGHT ---------- */
-  if (x + dvdWidth >= screenWidth) {
-    x = screenWidth - dvdWidth;
-    if (!touching.right) {
-      vx *= -1;
-      toggleLogo();
-      touching.right = true;
-    }
-  } else {
-    touching.right = false;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  if (x <= 0 || x + dvdWidth >= w) {
+    vx *= -1;
+    toggleLogo();
   }
 
-  /* ---------- TOP ---------- */
-  if (y <= 0) {
-    y = 0;
-    if (!touching.top) {
-      vy *= -1;
-      toggleLogo();
-      touching.top = true;
-    }
-  } else {
-    touching.top = false;
+  if (y <= 0 || y + dvdHeight >= h) {
+    vy *= -1;
+    toggleLogo();
   }
 
-  /* ---------- BOTTOM ---------- */
-  if (y + dvdHeight >= screenHeight) {
-    y = screenHeight - dvdHeight;
-    if (!touching.bottom) {
-      vy *= -1;
-      toggleLogo();
-      touching.bottom = true;
-    }
-  } else {
-    touching.bottom = false;
-  }
+  x = Math.max(0, Math.min(w - dvdWidth, x));
+  y = Math.max(0, Math.min(h - dvdHeight, y));
 
   dvd.style.transform = `translate(${x}px, ${y}px)`;
   requestAnimationFrame(animate);
 }
 
-/* ---------- INIT ---------- */
-
-// esperar a que todo exista
+/* -------------------------------
+   INIT
+-------------------------------- */
 window.addEventListener("load", () => {
   updateSizes();
+
+  x = Math.random() * (window.innerWidth - dvdWidth);
+  y = Math.random() * (window.innerHeight - dvdHeight);
+
   animate();
 });
 
-// recalcular en resize (rotación móvil incluida)
-window.addEventListener("resize", () => {
-  updateSizes();
-
-  speed = window.innerWidth <= 768 ? 1.2 : 2;
-  vx = Math.sign(vx) || 1;
-  vy = Math.sign(vy) || 1;
-  vx *= speed;
-  vy *= speed;
-});
+window.addEventListener("resize", updateSizes);
