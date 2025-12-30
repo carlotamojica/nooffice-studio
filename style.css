@@ -1,11 +1,32 @@
 :root {
-  --text-size: 32px;
-  --line-height: 1.1;
+  --text-size: 24px;
+  --line-height: 0.95;
 }
 
 @media (max-width: 768px) {
   :root {
-    --text-size: 28px; /* o el que te guste */
+    --text-size: 22px; /* tamaño de texto más pequeño en móvil */
+    --line-height: 0.95; /* interlineado un poco más grande en móvil */
+  }
+}
+
+.intro-text {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 620px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .intro-text {
+    padding: 64px;
+    max-width: 100%; /* opcional pero recomendable en móvil */
   }
 }
 
@@ -133,16 +154,9 @@ body {
     width: 260px;
   }
 
-  /* texto: MISMA MANCHA, SOLO ESCALA */
-  .intro-text {
-    transform: scale(0.75);
-  }
-
-  /* footer más discreto */
-  .footer-links {
-    font-size: 14px;
-    line-height: 1.1;
-  }
+.footer-links {
+  transform: none !important;
+}
 }
 
 * {
@@ -154,4 +168,16 @@ body {
 
 #dvd {
   touch-action: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.intro-text,
+.footer-links,
+.footer-links * {
+  font-size: var(--text-size) !important;
+  line-height: var(--line-height) !important;
 }
