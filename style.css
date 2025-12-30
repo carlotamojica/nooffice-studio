@@ -25,7 +25,7 @@
 
 @media (max-width: 768px) {
   .intro-text {
-    padding: 64px;
+    padding: 16px;
     max-width: 100%; /* opcional pero recomendable en móvil */
   }
 }
