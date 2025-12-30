@@ -1,3 +1,30 @@
+:root {
+  --text-size: 32px;
+  --line-height: 1.1;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --text-size: 28px; /* o el que te guste */
+  }
+}
+
+.intro-text {
+  font-size: var(--text-size);
+  line-height: var(--line-height);
+}
+
+.footer-links {
+  font-size: var(--text-size);
+  line-height: var(--line-height);
+}
+
+.footer-links a,
+.footer-links p {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -123,4 +150,8 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+#dvd {
+  touch-action: none;
 }
